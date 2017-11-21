@@ -9,6 +9,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+
+import java.util.HashMap;
 
 /**
  * An example SurfaceView for generating graphics on
@@ -32,6 +35,8 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     public Ball ball; //public for easy access
 
+    private HashMap<Integer, Ball> touches;
+
 
     /**
      * We need to override all the constructors, since we don't know which will be called
@@ -48,7 +53,7 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         super(context, attrs, defaultStyle);
 
         viewWidth = 1; viewHeight = 1; //positive defaults; will be replaced when #surfaceChanged() is called
-
+        touches = new HashMap<Integer, Ball>();
         // register our interest in hearing about changes to our surface
         mHolder = getHolder();
         mHolder.addCallback(this);
@@ -61,8 +66,12 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         goldPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         goldPaint.setColor(Color.rgb(145, 123, 76));
 
+        touches = new HashMap<>();
+
         init();
     }
+
+
 
     /**
      * Initialize graphical drawing state
@@ -70,6 +79,22 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     public void init(){
         //make ball
         ball = new Ball(viewWidth/2, viewHeight/2, 100);
+    }
+
+    public synchronized void addTouch(int pointerId, float x, float y){
+        Ball ballnew = new Ball(x,y,70);
+        touches.put(pointerId,ballnew);
+    }
+
+    public synchronized void removeTouch(int pointerId){
+        touches.remove(pointerId);
+    }
+
+    public synchronized void moveTouch(int pointerId, float x, float y){
+        Ball newBall = touches.get(pointerId);
+        newBall.setX(x);
+        newBall.setY(y);
+        this.touches.put(pointerId, newBall);
     }
 
 
